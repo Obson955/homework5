@@ -2,6 +2,8 @@ import sys
 from calculator import Calculator
 from decimal import Decimal, InvalidOperation
 
+from calculator.app import App
+
 def calculate_and_print(a, b, operation_name):
     operation_mappings = {
         'add': Calculator.add,
@@ -34,4 +36,5 @@ def main():
     calculate_and_print(a, b, operation)
 
 if __name__ == '__main__':
-    main()
+     app = App().start() 
+    
