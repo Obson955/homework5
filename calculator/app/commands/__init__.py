@@ -10,7 +10,6 @@ class CommandHandler:
         self.commands = {}
 
     def register_command(self, command_name: str, command: Command):
-        print(f"Registering command: {command_name}")  # Debug print
         self.commands[command_name] = command
 
     def execute_command(self, command_name: str):
