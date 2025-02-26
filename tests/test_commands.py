@@ -66,7 +66,8 @@ def test_menu_command(capfd):
 4. multiply - Multiply two numbers
 5. divide - Divide two numbers
 6. menu - Show this menu
-7. exit - Exit the application"""
+7. exit - Exit the application
+8. goodbye - Say goodbye"""
 
     assert out.strip() == expected_output.strip(), "The MenuCommand should print the correct menu"
 
