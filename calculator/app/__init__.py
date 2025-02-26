@@ -1,35 +1,35 @@
-from calculator.commands import CommandHandler
-#from calculator.commands.discord import DiscordCommand
-from calculator.commands.exit import ExitCommand
-from calculator.commands.goodbye import GoodbyeCommand
-from calculator.commands.greet import GreetCommand
-from calculator.commands.menu import MenuCommand
-from calculator.commands.add import AddCommand
-from calculator.commands.subtract import SubtractCommand
-from calculator.commands.multiply import MultiplyCommand
-from calculator.commands.divide import DivideCommand
-from calculator.commands.menu import MenuCommand 
+import pkgutil
+import importlib
+from calculator.app.commands import CommandHandler, Command
+from calculator.app.commands.command_handler import CalculatorCommand
 
 class App:
-    def __init__(self): # Constructor
+    def __init__(self):
         self.command_handler = CommandHandler()
 
+    def load_plugins(self):
+        # Dynamically load all plugins in the plugins directory
+        plugins_package = 'calculator.app.plugins'
+        for _, plugin_name, is_pkg in pkgutil.iter_modules([plugins_package.replace('.', '/')]):
+            if is_pkg:  # Ensure it's a package
+                plugin_module = importlib.import_module(f'{plugins_package}.{plugin_name}')
+                for item_name in dir(plugin_module):
+                    item = getattr(plugin_module, item_name)
+                    try:
+                        if issubclass(item, (Command)) and item is not Command:  # Changed this line
+                            self.command_handler.register_command(plugin_name, item())
+                    except TypeError:
+                        continue  # If item is not a class or unrelated class, just ignore
 
     def start(self):
-        # Register commands here
-        print("Welcome to the calculator!")
-        self.command_handler.register_command("greet", GreetCommand())
-        self.command_handler.register_command("goodbye", GoodbyeCommand())
-        self.command_handler.register_command("exit", ExitCommand())
-        self.command_handler.register_command("menu", MenuCommand())
-        #self.command_handler.register_command("discord", DiscordCommand())
-        self.command_handler.register_command("add", AddCommand())
-        self.command_handler.register_command("subtract", SubtractCommand())
-        self.command_handler.register_command("multiply", MultiplyCommand())
-        self.command_handler.register_command("divide", DivideCommand())
-       
-        while True:  #REPL Read, Evaluate, Print, Loop
-            self.command_handler.execute_command("menu")
-            self.command_handler.execute_command(input(">>> ").strip())
-
-
+        """Start the application loop."""
+        self.load_plugins()
+        print("Welcome to the calculator! Type 'exit' to quit.")
+        self.command_handler.execute_command("menu")
+        
+        while True:
+            command = input(">>> ").strip()
+            if command.lower() in ["exit", "quit"]:
+                print("Goodbye!")
+                break
+            self.command_handler.execute_command(command)
